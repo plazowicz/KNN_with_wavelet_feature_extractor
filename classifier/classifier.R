@@ -22,14 +22,14 @@ LoadData <- function(path, size=65536) {
 Normalize <- function(data) {
   means <- apply(data, 2, mean)
   maxs <- apply(data, 2, max)
-  mins <- apply(data, 2, min)
+  sds <- apply(data, 2, sd)
   for(i in 1:dim(data)[1]) {
     for(j in 1:dim(data)[2]) {
-      data[i,j] <- (data[i,j]-means[j])/(maxs[j]-mins[j])
+      data[i,j] <- (data[i,j]-means[j])/sds[j]
     }
   }
 #   data[!is.finite(data)] <- 0
-  data <- data[,apply(data, 2, Compose(is.finite, all))]
+#   data <- data[,apply(data, 2, Compose(is.finite, all))]
   data
 }
 
@@ -56,6 +56,8 @@ PrepareDataFrame <- function(featured.data, labels) {
   for(i in 1:length(featured.data)) {
     data <- rbind(data, featured.data[[i]])
   }
+# Normalization   
+  data <- Normalize(data)
   data <- cbind(data, labels)
 # Shuffle data   
   data <- data[sample.int(nrow(data)),] 
