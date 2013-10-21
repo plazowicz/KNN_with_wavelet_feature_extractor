@@ -1,11 +1,13 @@
 library('png')
 library('waveslim')
 library('functional')
+library('kknn')
 
-path.to.data <- '../Data/rotated/Set1'
+path.to.data <- '../Data/rotated/Set2'
 
 LoadData <- function(path, size=65536) {
 #   data <- matrix(nrow=0, ncol=size)
+  x <- ""
   data <- list()
   labels <- c()
   file.names <- dir(path=path)
@@ -93,11 +95,13 @@ DoKNN <- function(data, dist=2, kSupremum=100, folds.count=5) {
     
     for(i in 1:kSupremum) {
       kknn.result <- kknn(Labels~., train.data, test.data, distance=dist, k=i)
+      summary(kknn.result)
       fit <- fitted(kknn.result)
       errorRate <- sum(as.integer(fit != test.data$Labels))/nrow(test.data)
       errorRates[i,fold.index] <- errorRate
     } 
   }
+  print(errorRates)
   apply(errorRates, 1, mean)
 }
 
@@ -106,3 +110,5 @@ data <- both.data.labels[[1]]
 labels <- both.data.labels[[2]]
 featured.data <- ConvertDataToFeatures(data, 'haar', 2)
 data <- PrepareDataFrame(featured.data, labels)
+euclid <- DoKNN(data, kSupremum=15)
+plot(1:15, euclid, main="Error rate with respect to neighbours count", xlab="Neighbours count", ylab="Error rate", pch=15, col="green", ylim=c(0,1))
