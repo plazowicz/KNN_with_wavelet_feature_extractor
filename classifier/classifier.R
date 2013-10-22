@@ -2,6 +2,7 @@ library('png')
 library('waveslim')
 library('functional')
 library('kknn')
+library('graphics')
 
 path.to.data <- '../Data/rotated/Set2'
 
@@ -110,5 +111,9 @@ data <- both.data.labels[[1]]
 labels <- both.data.labels[[2]]
 featured.data <- ConvertDataToFeatures(data, 'haar', 2)
 data <- PrepareDataFrame(featured.data, labels)
+pc <- princomp(data[,1:(dim(data)[2]-1)])
+loadings(pc)
+plot(pc)
+biplot(pc)
 euclid <- DoKNN(data, kSupremum=15)
 plot(1:15, euclid, main="Error rate with respect to neighbours count", xlab="Neighbours count", ylab="Error rate", pch=15, col="green", ylim=c(0,1))
